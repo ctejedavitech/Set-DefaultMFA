@@ -1,0 +1,65 @@
+function Set-DefaultMFA {
+    param (
+        [string]$TenantId,
+        [string]$ClientId,
+        [string]$ClientSecret,
+        [string]$UserPrincipalName,
+        [string]$UserPreferredMethodForSecondaryAuthentication = "oath", # Default method is "oath"
+        [string]$SystemPreferredAuthenticationMethod = "PhoneAppNotification" # Default system preferred is "PhoneAppNotification"
+    )
+
+    # OAuth token endpoint
+    $tokenUrl = "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token"
+
+    # Define the body for the token request
+    $body = @{
+        client_id     = $ClientId
+        scope         = "https://graph.microsoft.com/.default"
+        client_secret = $ClientSecret
+        grant_type    = "client_credentials"
+    }
+
+    # Get the OAuth token
+    $tokenResponse = Invoke-RestMethod -Method Post -Uri $tokenUrl -ContentType "application/x-www-form-urlencoded" -Body $body
+
+    # Extract the access token from the response
+    $accessToken = $tokenResponse.access_token
+
+    # Define the API endpoint for a specific user
+    $apiUrl = "https://graph.microsoft.com/beta/users/$UserPrincipalName/authentication/signInPreferences"
+
+    # Define the payload to set the user's preferred and system-preferred MFA methods
+    $payload = @{
+        "@odata.context" = "https://graph.microsoft.com/beta/$metadata#users('$UserPrincipalName')/authentication/signInPreferences"
+        isSystemPreferredAuthenticationMethodEnabled = $true
+        userPreferredMethodForSecondaryAuthentication = $UserPreferredMethodForSecondaryAuthentication
+        systemPreferredAuthenticationMethod = $SystemPreferredAuthenticationMethod
+    }
+
+    # Convert the payload to JSON
+    $jsonPayload = $payload | ConvertTo-Json
+
+    # Define the headers with the OAuth token
+    $headers = @{
+        Authorization = "Bearer $accessToken"
+        "Content-Type" = "application/json"
+    }
+
+    # Make the PATCH request to set the default authentication method for the user
+    $response = Invoke-RestMethod -Method Patch -Uri $apiUrl -Headers $headers -Body $jsonPayload
+
+    # Output the response (will typically be No Content - 204 if successful)
+    if ($response.Length -eq 0) {
+        Write-Output "Successfully updated the default MFA method for $UserPrincipalName."
+    } else {
+        Write-Output $response
+    }
+}
+
+# Example usage:
+Set-DefaultMFA -TenantId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
+               -ClientId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
+               -ClientSecret "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" `
+               -UserPrincipalName "user@domain.com" `
+               -UserPreferredMethodForSecondaryAuthentication "oath" `
+               -SystemPreferredAuthenticationMethod "PhoneAppNotification"
