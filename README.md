@@ -97,17 +97,6 @@ Set-DefaultMFA -TenantId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
                -UserPreferredMethodForSecondaryAuthentication "oath" `
                -SystemPreferredAuthenticationMethod "PhoneAppNotification"
 
-
-Example Call
-
-powershell
-
-Set-DefaultMFA -TenantId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
-               -ClientId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
-               -ClientSecret "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" `
-               -UserPrincipalName "user@domain.com" `
-               -UserPreferredMethodForSecondaryAuthentication "oath" `
-               -SystemPreferredAuthenticationMethod "PhoneAppNotification"
 ```
 This will set the user's default MFA method to oath (One-Time Passcode) and the system-preferred method to PhoneAppNotification.
 
