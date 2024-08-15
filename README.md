@@ -96,3 +96,22 @@ Set-DefaultMFA -TenantId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
                -UserPrincipalName "user@domain.com" `
                -UserPreferredMethodForSecondaryAuthentication "oath" `
                -SystemPreferredAuthenticationMethod "PhoneAppNotification"
+
+
+Example Call
+
+powershell
+
+Set-DefaultMFA -TenantId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
+               -ClientId "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" `
+               -ClientSecret "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" `
+               -UserPrincipalName "user@domain.com" `
+               -UserPreferredMethodForSecondaryAuthentication "oath" `
+               -SystemPreferredAuthenticationMethod "PhoneAppNotification"
+
+This will set the user's default MFA method to oath (One-Time Passcode) and the system-preferred method to PhoneAppNotification.
+Notes
+
+    Security: Ensure that the client secret and other sensitive information are stored securely and not shared publicly.
+    Permissions: The script requires UserAuthenticationMethod.ReadWrite.All permissions to work properly.
+    Default Parameters: The function includes default values for UserPreferredMethodForSecondaryAuthentication and SystemPreferredAuthenticationMethod, but you can override them when calling the function.
